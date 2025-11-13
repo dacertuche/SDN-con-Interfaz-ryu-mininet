@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSFNET SDN Management Plane</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Vis.js para visualización de red -->
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <!-- Chart.js para gráficas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🌐 NSFNET SDN Management Plane</h1>
+            <div class="status-bar">
+                <span id="controller-status" class="status-badge">
+                    <span class="status-dot"></span>
+                    Controller: <span id="status-text">Connecting...</span>
+                </span>
+                <span id="mode-display" class="mode-badge">Mode: <strong id="current-mode">-</strong></span>
+            </div>
+        </header>
+
+        <!-- Control Panel -->
+        <section class="control-panel">
+            <h2>🎛️ Control Panel</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="routing-mode">Routing Mode:</label>
+                    <select id="routing-mode">
+                        <option value="hops">Shortest Path (Hops)</option>
+                        <option value="distrak">Dijkstra (1/BW)</option>
+                    </select>
+                    <button id="apply-mode" class="btn btn-primary">Apply Mode</button>
+                </div>
+                
+                <div class="control-group">
+                    <label>Path Calculator:</label>
+                    <input type="text" id="path-src" placeholder="Source (e.g., 1, s1, 10.0.0.1)" style="width: 180px;">
+                    <input type="text" id="path-dst" placeholder="Destination" style="width: 180px;">
+                    <button id="calculate-path" class="btn btn-secondary">Calculate Path</button>
+                </div>
+
+                <div class="control-group">
+                    <button id="refresh-stats" class="btn btn-secondary">🔄 Refresh Stats</button>
+                    <button id="reinstall-flows" class="btn btn-warning">⚙️ Reinstall Flows</button>
+                </div>
+            </div>
+            <div id="path-result" class="path-result"></div>
+        </section>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Topology Visualization -->
+            <section class="topology-section">
+                <h2>🗺️ Network Topology</h2>
+                <div id="topology-container"></div>
+                <div class="topology-legend">
+                    <div><span class="legend-box switch"></span> Switch</div>
+                    <div><span class="legend-box link-low"></span> Low utilization (&lt;30%)</div>
+                    <div><span class="legend-box link-medium"></span> Medium utilization (30-70%)</div>
+                    <div><span class="legend-box link-high"></span> High utilization (&gt;70%)</div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics -->
+            <section class="metrics-section">
+                <h2>📊 Performance Metrics</h2>
+                
+                <!-- Summary Cards -->
+                <div class="metrics-cards">
+                    <div class="metric-card">
+                        <h3>Total Throughput</h3>
+                        <p class="metric-value" id="total-throughput">0</p>
+                        <p class="metric-unit">Mbps</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Avg Utilization</h3>
+                        <p class="metric-value" id="avg-utilization">0</p>
+                        <p class="metric-unit">%</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Packet Loss</h3>
+                        <p class="metric-value" id="packet-loss">0</p>
+                        <p class="metric-unit">%</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Total Packets</h3>
+                        <p class="metric-value" id="total-packets">0</p>
+                        <p class="metric-unit">packets</p>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <h3>Link Utilization</h3>
+                        <canvas id="utilization-chart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Throughput per Link</h3>
+                        <canvas id="throughput-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Link Stats Table -->
+                <div class="stats-table-container">
+                    <h3>📋 Link Statistics</h3>
+                    <table id="link-stats-table" class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Link</th>
+                                <th>BW (Mbps)</th>
+                                <th>Throughput (Mbps)</th>
+                                <th>Utilization (%)</th>
+                                <th>Packet Loss (%)</th>
+                                <th>TX Packets</th>
+                                <th>RX Packets</th>
+                            </tr>
+                        </thead>
+                        <tbody id="link-stats-body">
+                            <tr><td colspan="7" class="no-data">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>NSFNET SDN Controller - Management Plane | Last update: <span id="last-update">-</span></p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
